@@ -18,12 +18,10 @@ from typing import Any, NamedTuple, Optional, Sequence, cast
 from fapolicy_analyzer import Trust
 from fapolicy_analyzer.ui.actions import (
     ADD_CHANGESETS,
-    ANCILLARY_TRUST_DEPLOYED,
     CLEAR_CHANGESETS,
-    ERROR_ANCILLARY_TRUST,
-    ERROR_DEPLOYING_ANCILLARY_TRUST,
-    RECEIVED_ANCILLARY_TRUST,
-    REQUEST_ANCILLARY_TRUST,
+    ERROR_RESTORE_SYSTEM_CHECKPOINT,
+    deploy_ancillary_trust,
+    get_ancillary_trust,
 )
 from redux import Action, Reducer, handle_actions
 
@@ -57,13 +55,6 @@ def handle_ancillary_trust_deployed(state: TrustState, action: Action) -> TrustS
     return _create_state(state, error=None, deployed=True)
 
 
-def handle_error_deploying_ancillary_trust(
-    state: TrustState, action: Action
-) -> TrustState:
-    payload = cast(str, action.payload)
-    return _create_state(state, error=payload)
-
-
 def handle_add_changesets(state: TrustState, action: Action) -> TrustState:
     return _create_state(state, error=None, deployed=False)
 
@@ -74,11 +65,12 @@ def handle_clear_changesets(state: TrustState, action: Action) -> TrustState:
 
 ancillary_trust_reducer: Reducer = handle_actions(
     {
-        REQUEST_ANCILLARY_TRUST: handle_request_ancillary_trust,
-        RECEIVED_ANCILLARY_TRUST: handle_received_ancillary_trust,
-        ERROR_ANCILLARY_TRUST: handle_error_ancillary_trust,
-        ANCILLARY_TRUST_DEPLOYED: handle_ancillary_trust_deployed,
-        ERROR_DEPLOYING_ANCILLARY_TRUST: handle_error_deploying_ancillary_trust,
+        get_ancillary_trust.request_type: handle_request_ancillary_trust,
+        get_ancillary_trust.receive_type: handle_received_ancillary_trust,
+        get_ancillary_trust.error_type: handle_error_ancillary_trust,
+        deploy_ancillary_trust.receive_type: handle_ancillary_trust_deployed,
+        deploy_ancillary_trust.error_type: handle_error_ancillary_trust,
+        ERROR_RESTORE_SYSTEM_CHECKPOINT: handle_error_ancillary_trust,
         ADD_CHANGESETS: handle_add_changesets,
         CLEAR_CHANGESETS: handle_clear_changesets,
     },

@@ -176,7 +176,7 @@ class DeployChangesetsOp(UIOperation):
 
             logging.debug("Deploying...")
             self.__deploying = True
-            dispatch((deploy_ancillary_trust()))
+            deploy_ancillary_trust.execute()
 
         dlgDeployList.destroy()
 

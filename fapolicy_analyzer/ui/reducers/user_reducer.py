@@ -16,7 +16,7 @@
 from typing import Any, NamedTuple, Optional, Sequence, cast
 
 from fapolicy_analyzer import User
-from fapolicy_analyzer.ui.actions import ERROR_USERS, RECEIVED_USERS, REQUEST_USERS
+from fapolicy_analyzer.ui.actions import get_users
 from redux import Action, Reducer, handle_actions
 
 
@@ -46,9 +46,9 @@ def handle_error_users(state: UserState, action: Action) -> UserState:
 
 user_reducer: Reducer = handle_actions(
     {
-        REQUEST_USERS: handle_request_users,
-        RECEIVED_USERS: handle_received_users,
-        ERROR_USERS: handle_error_users,
+        get_users.request_type: handle_request_users,
+        get_users.receive_type: handle_received_users,
+        get_users.error_type: handle_error_users,
     },
     UserState(error=None, users=[], loading=False),
 )

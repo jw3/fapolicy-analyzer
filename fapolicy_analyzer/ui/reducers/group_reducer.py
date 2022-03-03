@@ -16,7 +16,7 @@
 from typing import Any, NamedTuple, Optional, Sequence, cast
 
 from fapolicy_analyzer import Group
-from fapolicy_analyzer.ui.actions import ERROR_GROUPS, RECEIVED_GROUPS, REQUEST_GROUPS
+from fapolicy_analyzer.ui.actions import get_groups
 from redux import Action, Reducer, handle_actions
 
 
@@ -46,9 +46,9 @@ def handle_error_groups(state: GroupState, action: Action) -> GroupState:
 
 group_reducer: Reducer = handle_actions(
     {
-        REQUEST_GROUPS: handle_request_groups,
-        RECEIVED_GROUPS: handle_received_groups,
-        ERROR_GROUPS: handle_error_groups,
+        get_groups.request_type: handle_request_groups,
+        get_groups.receive_type: handle_received_groups,
+        get_groups.error_type: handle_error_groups,
     },
     GroupState(error=None, groups=[], loading=False),
 )

@@ -25,7 +25,7 @@ from .actions import (
     NotificationType,
     add_notification,
     apply_changesets,
-    request_ancillary_trust,
+    get_ancillary_trust,
 )
 from .ancillary_trust_file_list import AncillaryTrustFileList
 from .store import dispatch, get_system_feature
@@ -56,7 +56,7 @@ class AncillaryTrustDatabaseAdmin(UIConnectedWidget):
 
     def __load_trust(self):
         self._loading = True
-        dispatch(request_ancillary_trust())
+        get_ancillary_trust.execute()
 
     def __apply_changeset(self, changeset):
         dispatch(apply_changesets(changeset))
@@ -79,8 +79,20 @@ class AncillaryTrustDatabaseAdmin(UIConnectedWidget):
         untrustBtn = self.get_object("untrustBtn")
         if trusts:
             n_files = len(trusts)
-            n_true = sum([True for trust in trusts if getattr(trust, "status", "").lower() == "t"])
-            n_false = sum([True for trust in trusts if not getattr(trust, "status", "").lower() == "t"])
+            n_true = sum(
+                [
+                    True
+                    for trust in trusts
+                    if getattr(trust, "status", "").lower() == "t"
+                ]
+            )
+            n_false = sum(
+                [
+                    True
+                    for trust in trusts
+                    if not getattr(trust, "status", "").lower() == "t"
+                ]
+            )
             trustBtn.set_sensitive(n_files == n_false)
             untrustBtn.set_sensitive(n_files == n_true)
 

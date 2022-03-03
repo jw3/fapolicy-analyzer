@@ -25,11 +25,11 @@ from .acl_list import ACLList
 from .actions import (
     NotificationType,
     add_notification,
-    request_ancillary_trust,
-    request_events,
-    request_groups,
-    request_system_trust,
-    request_users,
+    get_ancillary_trust,
+    get_events,
+    get_groups,
+    get_system_trust,
+    get_users,
 )
 from .object_list import ObjectList
 from .store import dispatch, get_system_feature
@@ -166,14 +166,14 @@ class PolicyRulesAdminPage(UIConnectedWidget, UIPage):
         self.__users_loading = True
         self.__groups_loading = True
         self.__events_loading = True
-        dispatch(request_ancillary_trust())
-        dispatch(request_system_trust())
-        dispatch(request_users())
-        dispatch(request_groups())
+        get_ancillary_trust.execute()
+        get_system_trust.execute()
+        get_users.execute()
+        get_groups.execute()
         if self.__audit_file:
-            dispatch(request_events("debug", self.__audit_file))
+            get_events.execute("debug", self.__audit_file)
         else:
-            dispatch(request_events("syslog"))
+            get_events.execute("syslog")
 
     def __populate_list(
         self,

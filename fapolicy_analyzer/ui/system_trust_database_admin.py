@@ -21,7 +21,7 @@ from events import Events
 from fapolicy_analyzer.util import fs  # noqa: F401
 from fapolicy_analyzer.util.format import f
 
-from .actions import NotificationType, add_notification, request_system_trust
+from .actions import NotificationType, add_notification, get_system_trust
 from .configs import Colors
 from .store import dispatch, get_system_feature
 from .trust_file_details import TrustFileDetails
@@ -64,7 +64,7 @@ class SystemTrustDatabaseAdmin(UIConnectedWidget, Events):
 
     def __load_trust(self):
         self._loading = True
-        dispatch(request_system_trust())
+        get_system_trust.execute()
 
     def on_next_system(self, system):
         trustState = system.get("system_trust")
@@ -127,4 +127,6 @@ SHA256: {fs.sha(trust.path)}"""
 
     def on_addBtn_clicked(self, *args):
         if self.selectedFiles:
-            self.file_added_to_ancillary_trust(*[sfile.path for sfile in self.selectedFiles])
+            self.file_added_to_ancillary_trust(
+                *[sfile.path for sfile in self.selectedFiles]
+            )

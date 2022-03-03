@@ -16,7 +16,7 @@
 from typing import Any, NamedTuple, Optional, Sequence, cast
 
 from fapolicy_analyzer import Rule
-from fapolicy_analyzer.ui.actions import ERROR_RULES, RECEIVED_RULES, REQUEST_RULES
+from fapolicy_analyzer.ui.actions import get_rules
 from redux import Action, Reducer, handle_actions
 
 
@@ -46,9 +46,9 @@ def handle_error_rules(state: RuleState, action: Action) -> RuleState:
 
 rule_reducer: Reducer = handle_actions(
     {
-        REQUEST_RULES: handle_request_rules,
-        RECEIVED_RULES: handle_received_rules,
-        ERROR_RULES: handle_error_rules,
+        get_rules.request_type: handle_request_rules,
+        get_rules.receive_type: handle_received_rules,
+        get_rules.error_type: handle_error_rules,
     },
     RuleState(error=None, rules=[], loading=False),
 )

@@ -16,7 +16,7 @@
 from typing import Any, NamedTuple, Optional, Sequence, cast
 
 from fapolicy_analyzer import EventLog
-from fapolicy_analyzer.ui.actions import ERROR_EVENTS, RECEIVED_EVENTS, REQUEST_EVENTS
+from fapolicy_analyzer.ui.actions import get_events
 from redux import Action, Reducer, handle_actions
 
 
@@ -46,9 +46,9 @@ def handle_error_events(state: EventState, action: Action) -> EventState:
 
 event_reducer: Reducer = handle_actions(
     {
-        REQUEST_EVENTS: handle_request_events,
-        RECEIVED_EVENTS: handle_received_events,
-        ERROR_EVENTS: handle_error_events,
+        get_events.request_type: handle_request_events,
+        get_events.receive_type: handle_received_events,
+        get_events.error_type: handle_error_events,
     },
     EventState(error=None, log=None, loading=False),
 )

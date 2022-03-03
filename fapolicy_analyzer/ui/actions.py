@@ -15,9 +15,10 @@
 
 from enum import Enum
 from itertools import count
-from typing import Any, Iterator, NamedTuple, Sequence
+from typing import Any, Iterator, NamedTuple
 
-from fapolicy_analyzer import Changeset, Event, Group, Rule, Trust, User
+from fapolicy_analyzer import Changeset
+from fapolicy_analyzer.ui.resource import Resource
 from redux import Action, create_action
 
 INIT_SYSTEM = "INIT_SYSTEM"
@@ -29,38 +30,11 @@ REMOVE_NOTIFICATION = "REMOVE_NOTIFICATION"
 
 SET_SYSTEM_CHECKPOINT = "SET_SYSTEM_CHECKPOINT"
 RESTORE_SYSTEM_CHECKPOINT = "RESTORE_SYSTEM_CHECKPOINT"
+ERROR_RESTORE_SYSTEM_CHECKPOINT = "ERROR_RESTORE_SYSTEM_CHECKPOINT"
 
 ADD_CHANGESETS = "ADD_CHANGESETS"
 APPLY_CHANGESETS = "APPLY_CHANGESETS"
 CLEAR_CHANGESETS = "CLEAR_CHANGESET"
-
-REQUEST_ANCILLARY_TRUST = "REQUEST_ANCILLARY_TRUST"
-RECEIVED_ANCILLARY_TRUST = "RECEIVED_ANCILLARY_TRUST"
-ERROR_ANCILLARY_TRUST = "ERROR_ANCILLARY_TRUST"
-
-REQUEST_SYSTEM_TRUST = "REQUEST_SYSTEM_TRUST"
-RECEIVED_SYSTEM_TRUST = "RECEIVED_SYSTEM_TRUST"
-ERROR_SYSTEM_TRUST = "ERROR_SYSTEM_TRUST"
-
-DEPLOY_ANCILLARY_TRUST = "DEPLOY_ANCILLARY_TRUST"
-ANCILLARY_TRUST_DEPLOYED = "ANCILLARY_TRUST_DEPLOYED"
-ERROR_DEPLOYING_ANCILLARY_TRUST = "ERROR_DEPLOYING_ANCILLARY_TRUST"
-
-REQUEST_EVENTS = "REQUEST_EVENTS"
-RECEIVED_EVENTS = "RECEIVED_EVENTS"
-ERROR_EVENTS = "ERROR_EVENTS"
-
-REQUEST_USERS = "REQUEST_USERS"
-RECEIVED_USERS = "RECEIVED_USERS"
-ERROR_USERS = "ERROR_USERS"
-
-REQUEST_GROUPS = "REQUEST_GROUPS"
-RECEIVED_GROUPS = "RECEIVED_GROUPS"
-ERROR_GROUPS = "ERROR_GROUPS"
-
-REQUEST_RULES = "REQUEST_RULES"
-RECEIVED_RULES = "RECEIVED_RULES"
-ERROR_RULES = "ERROR_RULES"
 
 
 def _create_action(type: str, payload: Any = None) -> Action:
@@ -83,6 +57,15 @@ class Notification(NamedTuple):
     type: NotificationType
 
 
+deploy_ancillary_trust = Resource("DEPLOY_ANCILLARY_TRUST")
+get_ancillary_trust = Resource("GET_ANCILLARY_TRUST")
+get_events = Resource("GET_EVENTS")
+get_groups = Resource("GET_GROUPS")
+get_rules = Resource("GET_RULES")
+get_system_trust = Resource("GET_SYSTEM_TRUST")
+get_users = Resource("GET_USERS")
+
+
 def add_notification(text: str, type: NotificationType) -> Action:
     return _create_action(ADD_NOTIFICATION, (Notification(next(_ids), text, type)))
 
@@ -103,42 +86,6 @@ def clear_changesets() -> Action:
     return _create_action(CLEAR_CHANGESETS)
 
 
-def request_ancillary_trust() -> Action:
-    return _create_action(REQUEST_ANCILLARY_TRUST)
-
-
-def received_ancillary_trust(trust: Sequence[Trust]) -> Action:
-    return _create_action(RECEIVED_ANCILLARY_TRUST, trust)
-
-
-def error_ancillary_trust(error: str) -> Action:
-    return _create_action(ERROR_ANCILLARY_TRUST, error)
-
-
-def request_system_trust() -> Action:
-    return _create_action(REQUEST_SYSTEM_TRUST)
-
-
-def received_system_trust(trust: Sequence[Trust]) -> Action:
-    return _create_action(RECEIVED_SYSTEM_TRUST, trust)
-
-
-def error_system_trust(error: str) -> Action:
-    return _create_action(ERROR_SYSTEM_TRUST, error)
-
-
-def deploy_ancillary_trust() -> Action:
-    return _create_action(DEPLOY_ANCILLARY_TRUST)
-
-
-def ancillary_trust_deployed() -> Action:
-    return _create_action(ANCILLARY_TRUST_DEPLOYED)
-
-
-def error_deploying_ancillary_trust(error: str) -> Action:
-    return _create_action(ERROR_DEPLOYING_ANCILLARY_TRUST, error)
-
-
 def set_system_checkpoint() -> Action:
     return _create_action(SET_SYSTEM_CHECKPOINT)
 
@@ -147,52 +94,8 @@ def restore_system_checkpoint() -> Action:
     return _create_action(RESTORE_SYSTEM_CHECKPOINT)
 
 
-def request_events(log_type: str, file: str = None) -> Action:
-    return _create_action(REQUEST_EVENTS, (log_type, file))
-
-
-def received_events(events: Sequence[Event]) -> Action:
-    return _create_action(RECEIVED_EVENTS, events)
-
-
-def error_events(error: str) -> Action:
-    return _create_action(ERROR_EVENTS, error)
-
-
-def request_users() -> Action:
-    return _create_action(REQUEST_USERS)
-
-
-def received_users(users: Sequence[User]) -> Action:
-    return _create_action(RECEIVED_USERS, users)
-
-
-def error_users(error: str) -> Action:
-    return _create_action(ERROR_USERS, error)
-
-
-def request_groups() -> Action:
-    return _create_action(REQUEST_GROUPS)
-
-
-def received_groups(groups: Sequence[Group]) -> Action:
-    return _create_action(RECEIVED_GROUPS, groups)
-
-
-def error_groups(error: str) -> Action:
-    return _create_action(ERROR_GROUPS, error)
-
-
-def request_rules() -> Action:
-    return _create_action(REQUEST_RULES)
-
-
-def received_rules(rules: Sequence[Rule]) -> Action:
-    return _create_action(RECEIVED_RULES, rules)
-
-
-def error_rules(error: str) -> Action:
-    return _create_action(ERROR_RULES, error)
+def error_restore_system_checkpoint() -> Action:
+    return _create_action(ERROR_RESTORE_SYSTEM_CHECKPOINT)
 
 
 def init_system() -> Action:

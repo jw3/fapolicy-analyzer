@@ -17,11 +17,7 @@ import logging
 from typing import Any, Optional, Sequence
 
 from fapolicy_analyzer import Rule
-from fapolicy_analyzer.ui.actions import (
-    NotificationType,
-    add_notification,
-    request_rules,
-)
+from fapolicy_analyzer.ui.actions import NotificationType, add_notification, get_rules
 from fapolicy_analyzer.ui.rules.rules_list_view import RulesListView
 from fapolicy_analyzer.ui.rules.rules_text_view import RulesTextView
 from fapolicy_analyzer.ui.store import dispatch, get_system_feature
@@ -55,7 +51,7 @@ class RulesAdminPage(UIConnectedWidget, UIPage):
 
     def __load_rules(self):
         self.__loading = True
-        dispatch(request_rules())
+        get_rules.execute()
 
     def __populate_rules(self):
         self.__text_view.render_rules(self.__rules)

@@ -25,32 +25,19 @@ from typing import Callable, Sequence
 from fapolicy_analyzer import Changeset, System, rollback_fapolicyd
 from fapolicy_analyzer.ui.actions import (
     APPLY_CHANGESETS,
-    DEPLOY_ANCILLARY_TRUST,
-    REQUEST_ANCILLARY_TRUST,
-    REQUEST_EVENTS,
-    REQUEST_GROUPS,
-    REQUEST_RULES,
-    REQUEST_SYSTEM_TRUST,
-    REQUEST_USERS,
     RESTORE_SYSTEM_CHECKPOINT,
     SET_SYSTEM_CHECKPOINT,
     add_changesets,
-    ancillary_trust_deployed,
     clear_changesets,
-    error_ancillary_trust,
-    error_deploying_ancillary_trust,
-    error_events,
-    error_groups,
-    error_rules,
-    error_system_trust,
-    error_users,
+    deploy_ancillary_trust,
+    error_restore_system_checkpoint,
+    get_ancillary_trust,
+    get_events,
+    get_groups,
+    get_rules,
+    get_system_trust,
+    get_users,
     init_system,
-    received_ancillary_trust,
-    received_events,
-    received_groups,
-    received_rules,
-    received_system_trust,
-    received_users,
     system_initialization_error,
     system_initialized,
 )
@@ -125,11 +112,11 @@ def create_system_feature(
 
     def _get_ancillary_trust(_: Action) -> Action:
         trust = _system.ancillary_trust()
-        return received_ancillary_trust(trust)
+        return get_ancillary_trust.receive(trust)
 
     def _get_system_trust(_: Action) -> Action:
         trust = _system.system_trust()
-        return received_system_trust(trust)
+        return get_system_trust.receive(trust)
 
     def _deploy_ancillary_trust(_: Action) -> Action:
         if not fapd_dbase_snapshot():
@@ -137,7 +124,7 @@ def create_system_feature(
                 "Fapolicyd pre-deploy backup failed, continuing with deployment."
             )
         _system.deploy()
-        return ancillary_trust_deployed()
+        return deploy_ancillary_trust.receive()
 
     def _set_checkpoint(action: Action) -> Action:
         global _checkpoint
@@ -158,19 +145,19 @@ def create_system_feature(
             events = _system.load_syslog()
         else:
             events = []
-        return received_events(events)
+        return get_events.receive(events)
 
     def _get_users(_: Action) -> Action:
         users = _system.users()
-        return received_users(users)
+        return get_users.receive(users)
 
     def _get_groups(_: Action) -> Action:
         groups = _system.groups()
-        return received_groups(groups)
+        return get_groups.receive(groups)
 
     def _get_rules(_: Action) -> Action:
         rules = _system.rules()
-        return received_rules(rules)
+        return get_rules.receive(rules)
 
     init_epic = pipe(
         of_init_feature(SYSTEM_FEATURE),
@@ -183,21 +170,21 @@ def create_system_feature(
     )
 
     request_ancillary_trust_epic = pipe(
-        of_type(REQUEST_ANCILLARY_TRUST),
+        of_type(get_ancillary_trust.request_type),
         map(_get_ancillary_trust),
-        catch(lambda ex, source: of(error_ancillary_trust(str(ex)))),
+        catch(lambda ex, source: of(get_ancillary_trust.error(str(ex)))),
     )
 
     request_system_trust_epic = pipe(
-        of_type(REQUEST_SYSTEM_TRUST),
+        of_type(get_system_trust.request_type),
         map(_get_system_trust),
-        catch(lambda ex, source: of(error_system_trust(str(ex)))),
+        catch(lambda ex, source: of(get_system_trust.error(str(ex)))),
     )
 
     deploy_ancillary_trust_epic = pipe(
-        of_type(DEPLOY_ANCILLARY_TRUST),
+        of_type(deploy_ancillary_trust.request_type),
         map(_deploy_ancillary_trust),
-        catch(lambda ex, source: of(error_deploying_ancillary_trust(str(ex)))),
+        catch(lambda ex, source: of(deploy_ancillary_trust.error(str(ex)))),
     )
 
     set_system_checkpoint_epic = pipe(
@@ -207,31 +194,31 @@ def create_system_feature(
     restore_system_checkpoint_epic = pipe(
         of_type(RESTORE_SYSTEM_CHECKPOINT),
         map(_restore_checkpoint),
-        catch(lambda ex, source: of(error_deploying_ancillary_trust(str(ex)))),
+        catch(lambda ex, source: of(error_restore_system_checkpoint(str(ex)))),
     )
 
     request_events_epic = pipe(
-        of_type(REQUEST_EVENTS),
+        of_type(get_events.request_type),
         map(_get_events),
-        catch(lambda ex, source: of(error_events(str(ex)))),
+        catch(lambda ex, source: of(get_events.error(str(ex)))),
     )
 
     request_users_epic = pipe(
-        of_type(REQUEST_USERS),
+        of_type(get_users.request_type),
         map(_get_users),
-        catch(lambda ex, source: of(error_users(str(ex)))),
+        catch(lambda ex, source: of(get_events.error(str(ex)))),
     )
 
     request_groups_epic = pipe(
-        of_type(REQUEST_GROUPS),
+        of_type(get_groups.request_type),
         map(_get_groups),
-        catch(lambda ex, source: of(error_groups(str(ex)))),
+        catch(lambda ex, source: of(get_events.error(str(ex)))),
     )
 
     request_rules_epic = pipe(
-        of_type(REQUEST_RULES),
+        of_type(get_rules.request_type),
         map(_get_rules),
-        catch(lambda ex, source: of(error_rules(str(ex)))),
+        catch(lambda ex, source: of(get_events.error(str(ex)))),
     )
 
     system_epic = combine_epics(

@@ -16,11 +16,7 @@
 from typing import Any, NamedTuple, Optional, Sequence, cast
 
 from fapolicy_analyzer import Trust
-from fapolicy_analyzer.ui.actions import (
-    ERROR_SYSTEM_TRUST,
-    RECEIVED_SYSTEM_TRUST,
-    REQUEST_SYSTEM_TRUST,
-)
+from fapolicy_analyzer.ui.actions import get_system_trust
 from redux import Action, Reducer, handle_actions
 
 
@@ -50,9 +46,9 @@ def handle_error_system_trust(state: TrustState, action: Action) -> TrustState:
 
 system_trust_reducer: Reducer = handle_actions(
     {
-        REQUEST_SYSTEM_TRUST: handle_request_system_trust,
-        RECEIVED_SYSTEM_TRUST: handle_received_system_trust,
-        ERROR_SYSTEM_TRUST: handle_error_system_trust,
+        get_system_trust.request_type: handle_request_system_trust,
+        get_system_trust.receive_type: handle_received_system_trust,
+        get_system_trust.error_type: handle_error_system_trust,
     },
     TrustState(error=None, trust=[], loading=False),
 )
