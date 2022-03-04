@@ -19,6 +19,7 @@ from typing import Optional, Sequence
 import gi
 from events import Events
 from fapolicy_analyzer import EventLog, Group, Trust, User
+from fapolicy_analyzer.ui.reducers import ResourceState
 from fapolicy_analyzer.util import acl, fs
 
 from .acl_list import ACLList
@@ -372,12 +373,12 @@ class PolicyRulesAdminPage(UIConnectedWidget, UIPage):
                 iter([s for s in self.__switchers if s.get_is_primary()])
             ).exec_data_func()
 
-        eventsState = system.get("events")
-        groupState = system.get("groups")
-        userState = system.get("users")
+        eventsState: ResourceState = system.get("events")
+        groupState: ResourceState = system.get("groups")
+        userState: ResourceState = system.get("users")
 
         # these should already be loaded in state from the initial DB Admin Tool load
-        self.__system_trust = system.get("system_trust").trust
+        self.__system_trust = system.get("system_trust").resource
         self.__ancillary_trust = system.get("ancillary_trust").trust
 
         if eventsState.error and not eventsState.loading and self.__events_loading:
@@ -391,10 +392,10 @@ class PolicyRulesAdminPage(UIConnectedWidget, UIPage):
         elif (
             self.__events_loading
             and not eventsState.loading
-            and self.__log != eventsState.log
+            and self.__log != eventsState.resource
         ):
             self.__events_loading = False
-            self.__log = eventsState.log
+            self.__log = eventsState.resource
             exec_primary_data_func()
 
         if userState.error and not userState.loading and self.__users_loading:
@@ -408,10 +409,10 @@ class PolicyRulesAdminPage(UIConnectedWidget, UIPage):
         elif (
             self.__users_loading
             and not userState.loading
-            and self.__users != userState.users
+            and self.__users != userState.resource
         ):
             self.__users_loading = False
-            self.__users = userState.users
+            self.__users = userState.resource
             exec_primary_data_func()
 
         if groupState.error and not groupState.loading and self.__groups_loading:
@@ -425,10 +426,10 @@ class PolicyRulesAdminPage(UIConnectedWidget, UIPage):
         elif (
             self.__groups_loading
             and not groupState.loading
-            and self.__groups != groupState.groups
+            and self.__groups != groupState.resource
         ):
             self.__groups_loading = False
-            self.__groups = groupState.groups
+            self.__groups = groupState.resource
             exec_primary_data_func()
 
         self.user_list.set_loading(

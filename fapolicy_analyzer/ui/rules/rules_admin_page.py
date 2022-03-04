@@ -18,6 +18,7 @@ from typing import Any, Optional, Sequence
 
 from fapolicy_analyzer import Rule
 from fapolicy_analyzer.ui.actions import NotificationType, add_notification, get_rules
+from fapolicy_analyzer.ui.reducers import ResourceState
 from fapolicy_analyzer.ui.rules.rules_list_view import RulesListView
 from fapolicy_analyzer.ui.rules.rules_text_view import RulesTextView
 from fapolicy_analyzer.ui.store import dispatch, get_system_feature
@@ -58,7 +59,7 @@ class RulesAdminPage(UIConnectedWidget, UIPage):
         self.__list_view.render_rules(self.__rules)
 
     def on_next_system(self, system: Any):
-        rules_state = system.get("rules")
+        rules_state: ResourceState = system.get("rules")
 
         if not rules_state.loading and self.__error != rules_state.error:
             self.__error = rules_state.error
@@ -68,9 +69,9 @@ class RulesAdminPage(UIConnectedWidget, UIPage):
         elif (
             self.__loading
             and not rules_state.loading
-            and self.__rules != rules_state.rules
+            and self.__rules != rules_state.resource
         ):
             self.__error = None
             self.__loading = False
-            self.__rules = rules_state.rules
+            self.__rules = rules_state.resource
             self.__populate_rules()

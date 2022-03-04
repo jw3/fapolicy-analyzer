@@ -14,7 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import Tuple
+
 from .notification_reducer import notification_reducer
+from .resource_reducer import ResourceState
 from .system_reducer import system_reducer
 
-__all__: Tuple[str, ...] = ("notification_reducer", "system_reducer")
+__all__: Tuple[str, ...] = ("notification_reducer", "system_reducer", "ResourceState")

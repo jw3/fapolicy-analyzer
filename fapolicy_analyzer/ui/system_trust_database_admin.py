@@ -23,6 +23,7 @@ from fapolicy_analyzer.util.format import f
 
 from .actions import NotificationType, add_notification, get_system_trust
 from .configs import Colors
+from .reducers import ResourceState
 from .store import dispatch, get_system_feature
 from .trust_file_details import TrustFileDetails
 from .trust_file_list import TrustFileList
@@ -67,7 +68,7 @@ class SystemTrustDatabaseAdmin(UIConnectedWidget, Events):
         get_system_trust.execute()
 
     def on_next_system(self, system):
-        trustState = system.get("system_trust")
+        trustState: ResourceState = system.get("system_trust")
 
         if not trustState.loading and self._error != trustState.error:
             self._error = trustState.error
@@ -79,11 +80,13 @@ class SystemTrustDatabaseAdmin(UIConnectedWidget, Events):
                 )
             )
         elif (
-            self._loading and not trustState.loading and self._trust != trustState.trust
+            self._loading
+            and not trustState.loading
+            and self._trust != trustState.resource
         ):
             self._error = None
             self._loading = False
-            self._trust = trustState.trust
+            self._trust = trustState.resource
             self.trustFileList.load_trust(self._trust)
 
     def on_trust_selection_changed(self, trusts):
