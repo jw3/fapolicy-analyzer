@@ -2,12 +2,13 @@ on:
   push:
     branches:
       - master
+      - 'release-*'
+      - 'demo-*'
     tags:
       - 'v*'
   pull_request:
     branches:
       - master
-      - 'release-*'
 
 name: Create RPM Release
 
