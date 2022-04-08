@@ -58,7 +58,9 @@ impl Display for RuleParseError<Trace<&str>> {
             ExpectedDecision(_) => f.write_str("Expected Decision"),
             UnknownDecision(_, _) => f.write_str("Unknown Decision"),
             ExpectedPermTag(_, _) => f.write_str("Expected tag 'perm'"),
-            ExpectedPermType(_, _) => f.write_str("Expected one of 'any', 'open', 'execute'"),
+            ExpectedPermType(_, _) => {
+                f.write_str("Expected perm to be one of 'any', 'open', 'execute'")
+            }
             ExpectedPermAssignment(_) => f.write_str("Expected assignment (=)"),
             ExpectedEndOfInput(_) => f.write_str("Unexpected trailing chars"),
             ExpectedWhitespace(_) => f.write_str("Expected whitespace"),
