@@ -143,7 +143,7 @@ impl PySystem {
     }
 
     fn rules(&self) -> PyResult<Vec<PyRule>> {
-        Ok(self
+        let mut r: Vec<PyRule> = self
             .rs
             .rules_db
             .iter()
@@ -166,7 +166,9 @@ impl PySystem {
 
                 PyRule::new(*id, text, origin, info, valid)
             })
-            .collect())
+            .collect();
+        r.reverse();
+        Ok(r)
     }
 
     fn rules_text(&self) -> PyResult<String> {
