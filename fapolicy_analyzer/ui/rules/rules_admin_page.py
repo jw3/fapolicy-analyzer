@@ -28,7 +28,7 @@ from fapolicy_analyzer.ui.rules.rules_list_view import RulesListView
 from fapolicy_analyzer.ui.rules.rules_text_view import RulesTextView
 from fapolicy_analyzer.ui.store import dispatch, get_system_feature
 from fapolicy_analyzer.ui.strings import RULES_LOAD_ERROR, RULES_TEXT_LOAD_ERROR
-from fapolicy_analyzer.ui.ui_page import UIPage
+from fapolicy_analyzer.ui.ui_page import UIAction, UIPage
 from fapolicy_analyzer.ui.ui_widget import UIConnectedWidget
 from fapolicy_analyzer.util.format import f
 
@@ -38,7 +38,17 @@ class RulesAdminPage(UIConnectedWidget, UIPage):
         UIConnectedWidget.__init__(
             self, get_system_feature(), on_next=self.on_next_system
         )
-        UIPage.__init__(self, {})
+        actions = {
+            "rules": [
+                UIAction(
+                    "Validate",
+                    "Validate Rules",
+                    "emblem-default",
+                    {"clicked": self.on_validate_clicked},
+                ),
+            ]
+        }
+        UIPage.__init__(self, actions)
 
         self.__text_view: RulesTextView = RulesTextView()
         self.get_object("textEditorContent").pack_start(
@@ -80,6 +90,9 @@ class RulesAdminPage(UIConnectedWidget, UIPage):
                 )
             )
         )
+
+    def on_validate_clicked(self, *args):
+        print("validate clicked")
 
     def on_next_system(self, system: Any):
         rules_state = system.get("rules")
