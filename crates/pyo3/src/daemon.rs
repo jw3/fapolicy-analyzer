@@ -65,10 +65,8 @@ impl PyHandle {
     }
 
     /// returns the unit status, throws if invalid unit
-    pub fn is_active(&self) -> PyResult<bool> {
-        self.rs
-            .active()
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+    pub fn is_active(&self) -> bool {
+        self.rs.active().unwrap_or(false)
     }
 
     /// returns true if the unit exists, false otherwise
@@ -121,10 +119,8 @@ fn rollback_fapolicyd(to: PySystem) -> PyResult<()> {
 }
 
 #[pyfunction]
-fn is_fapolicyd_active() -> PyResult<bool> {
-    Handle::default()
-        .active()
-        .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+fn is_fapolicyd_active() -> bool {
+    Handle::default().active().unwrap_or(false)
 }
 
 enum State {
