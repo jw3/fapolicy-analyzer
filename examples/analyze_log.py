@@ -17,31 +17,35 @@ from fapolicy_analyzer import *
 
 
 def show_event(e):
-    s = e.subject
-    o = e.object
-    print(f'{e.uid}:{e.gid} {s.file} => {o.file}')
+    sub = e.subject
+    obj = e.object
+    print(f"\t - {e.uid}:{e.gid} {sub.file} => {obj.file}")
 
 
 s = System()
-log = s.events('tests/data/events1.log')
+log = s.load_debuglog("tests/data/events2.log")
 
-print(f"Subjects in log: {len(log.subjects())}\n")
+users_in_log = []
+for u in s.users():
+    if log.by_user(u.id):
+        users_in_log.append(u.id)
 
-print('# Subject events')
-for e in log.by_subject('/bin/bash'):
-    show_event(e)
+groups_in_log = []
+for g in s.groups():
+    if log.by_group(g.id):
+        groups_in_log.append(g.id)
+
+print(f"## Users in log: {users_in_log}")
+print(f"## Groups in log: {groups_in_log}")
+print(f"## Subjects in log: {len(log.subjects())}")
 print()
 
-print('# User events - 1')
-for e in log.by_user(1):
-    show_event(e)
-print()
+print("## User events")
+for uid in users_in_log:
+    for e in log.by_user(uid):
+        show_event(e)
 
-print('Group events- 555')
-for e in log.by_group(555):
-    show_event(e)
-print()
-
-print('Group events - 888')
-for e in log.by_group(888):
-    show_event(e)
+print("## Group events")
+for gid in groups_in_log:
+    for e in log.by_group(gid):
+        show_event(e)
