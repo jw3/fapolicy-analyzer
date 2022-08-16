@@ -1,2 +1,2 @@
-rule=1 dec=deny perm=open uid=0 gid=0 pid=55523 exe=/usr/bin/vi : path=/etc/ld.so.cache ftype=application/octet-stream trust=0
+rule=1 dec=deny perm=open uid=0 gid=0 pid=55523 exe=/usr/bin/ls : path=/etc/ld.so.cache ftype=application/octet-stream trust=0
 rule=1 dec=deny perm=open uid=1 gid=0 pid=55523 exe=/usr/bin/ls : path=/etc/ld.so.cache ftype=application/octet-stream trust=0
