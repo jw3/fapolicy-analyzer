@@ -2,7 +2,7 @@
 ---
 
 - set_fact:
-    analyzer_version: "{{ lookup('env', 'analyzer_version') | default('latest', True) }}"
+    analyzer_version: "{{ lookup('env', 'analyzer_version') | default('v0.6.0-rc3', True) }}"
 
 - name: get latest release tag
   shell: curl https://api.github.com/repos/ctc-oss/fapolicy-analyzer/releases/latest | jq -r .tag_name
@@ -18,11 +18,11 @@
     verbosity: 0
 
 - name: get release metadata
-  shell: "curl https://api.github.com/repos/ctc-oss/fapolicy-analyzer/releases | jq -r '.[] | select(.tag_name == \"{{ analyzer_version }}\")'"
+  shell: "curl -s https://api.github.com/repos/ctc-oss/fapolicy-analyzer/releases | jq -r '.[] | select(.tag_name == \"{{ analyzer_version }}\")'"
   register: analyzer_release_json
 
 - name: register release url
-  shell: "echo '{{ analyzer_release_json.stdout }}' | jq -r '.assets[].browser_download_url | select(contains(\"{{ platform_id }}.x86\"))'"
+  shell: "echo '{{ analyzer_release_json.stdout }}' | jq -r '.assets[].browser_download_url | select(contains(\"{{ platform_id }}.x86_64\"))'"
   register: analyzer_release_url
 
 - set_fact:
