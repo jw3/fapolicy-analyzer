@@ -21,23 +21,34 @@
   shell: "curl -s https://api.github.com/repos/ctc-oss/fapolicy-analyzer/releases | jq -r '.[] | select(.tag_name == \"{{ analyzer_version }}\")'"
   register: analyzer_release_json
 
-- name: register release url
-  shell: "echo '{{ analyzer_release_json.stdout }}' | jq -r '.assets[].browser_download_url | select(contains(\"{{ platform_id }}.x86_64\"))'"
-  register: analyzer_release_url
+- name: register rpm url
+  shell: "echo '{{ analyzer_release_json.stdout }}' | jq -r '.assets[].browser_download_url | select(contains(\"{{ platform_id }}.x86\"))'"
+  register: analyzer_rpm_url
+
+- name: register tools urls
+  shell: "echo '{{ analyzer_release_json.stdout }}' | jq -r '.assets[].browser_download_url | select(contains(\"tdb\") or contains(\"rulec\"))'"
+  register: analyzer_tools_urls
 
 - set_fact:
-    analyzer_release_url: "{{ analyzer_release_url.stdout }}"
+    analyzer_rpm_url: "{{ analyzer_rpm_url.stdout }}"
 
 - name: show rpm url
   debug:
-    msg: "{{ analyzer_release_url }}"
+    msg: "{{ analyzer_rpm_url }}"
     verbosity: 0
 
-- name: install
+- name: install rpm
   yum:
-    name: "{{ analyzer_release_url }}"
+    name: "{{ analyzer_rpm_url }}"
     state: present
     disable_gpg_check: yes  # todo;; gpg signing
+
+- name: install tools
+  get_url:
+    url: "{{ item }}"
+    dest: /usr/local/bin
+    mode: '0775'
+  loop: "{{ analyzer_tools_urls.stdout_lines }}"
 
 - name: update gtk mimes
   shell: |
