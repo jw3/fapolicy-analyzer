@@ -1,0 +1,52 @@
+[10-languages.rules]
+# This file contains the list of all identified languages on the system
+%languages=application/x-bytecode.ocaml,application/x-bytecode.python,application/java-archive,text/x-java,application/x-java-applet,application/javascript,text/javascript,text/x-awk,text/x-gawk,text/x-lisp,application/x-elc,text/x-lua,text/x-m4,text/x-nftables,text/x-perl,text/x-php,text/x-python,text/x-R,text/x-ruby,text/x-script.guile,text/x-tcl,text/x-luatex,text/x-systemtap
+
+[20-dracut.rules]
+# Carve out an exception for dracut's initramfs building
+allow perm=any uid=0 : dir=/var/tmp/
+allow perm=any uid=0 trust=1 : all
+
+[21-updaters.rules]
+# We have to carve out an exception for the system updaters
+# or things go very bad (deadlock).
+allow perm=open exe=/usr/bin/rpm : all
+allow perm=open exe=/usr/libexec/platform-python3.6 comm=dnf : all
+
+[30-patterns.rules]
+# This file contains the list of all patterns. Only the ld_so pattern
+# is enabled by default.
+deny_audit perm=any pattern=ld_so : all
+#deny_audit perm=any pattern=ld_preload : all
+#deny_audit perm=any pattern=static : all
+
+[40-bad-elf.rules]
+# Do not allow malformed ELF even if trusted
+deny_audit perm=any all : ftype=application/x-bad-elf
+
+[41-shared-obj.rules]
+# Only allow known ELF libs - this is ahead of executable because typical
+# executable is linked with a dozen or more libraries.
+allow perm=open all : ftype=application/x-sharedlib trust=1
+deny_audit perm=open all : ftype=application/x-sharedlib
+
+[42-trusted-elf.rules]
+# Allow trusted programs to execute
+allow perm=execute all : trust=1
+
+[70-trusted-lang.rules]
+# Allow any program to open trusted language files
+allow perm=open all : ftype=%languages trust=1
+deny_audit perm=any all : ftype=%languages
+
+[72-shell.rules]
+# Allow all shell script execution and sourcing
+allow perm=any all : ftype=text/x-shellscript
+
+[90-deny-execute.rules]
+# Deny execution for anything untrusted
+deny_audit perm=execute all : all
+
+[95-allow-open.rules]
+# Allow everything else to open any file
+allow perm=open all : all
