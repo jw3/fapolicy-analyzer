@@ -2,7 +2,7 @@
 ---
 
 - set_fact:
-    analyzer_version: "{{ lookup('env', 'analyzer_version') | default('v0.6.0-rc3', True) }}"
+    analyzer_version: "{{ lookup('env', 'analyzer_version') | default('latest', True) }}"
 
 - name: get latest release tag
   shell: curl https://api.github.com/repos/ctc-oss/fapolicy-analyzer/releases/latest | jq -r .tag_name
