@@ -30,7 +30,7 @@ Requires:       {{ pyrpm }} >= 3.6
 BuildRequires:  {{ pyrpm }} >= 3.6, {{ pyrpm }}-rpm-macros, {{ pyrpm }}-devel, {{ pyrpm }}-pip, {{ pyrpm }}-wheel
 Recommends:     {{ pyrpm }}-gobject, {{ pyrpm }}-events, {{ pyrpm }}-configargparse, {{ pyrpm }}-more-itertools, {{ pyrpm }}-rx, {{ pyrpm }}-importlib-resources, {{ pyrpm }}-importlib-metadata, {{ pyrpm }}-dataclasses
 Requires:       gtk3, dbus-libs, gtksourceview3
-BuildRequires:  dbus-devel, cargo
+BuildRequires:  dbus-devel, cargo, itstool, pandoc
 AutoReqProv:    no
 
 # For tools not packaged in el8, just use pip always.
@@ -45,6 +45,7 @@ GUI and CLI tools to assist with the configuration and maintenance of fapolicyd
 
 %build
 VERSION=%{app_version} %{python3} setup.py compile_catalog -f
+VERSION=%{app_version} %{python3} setup.py build_help
 VERSION=%{app_version} %{python3} setup.py bdist_wheel
 
 %install
