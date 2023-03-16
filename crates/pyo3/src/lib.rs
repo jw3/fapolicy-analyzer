@@ -14,6 +14,7 @@ pub mod auparse;
 pub mod check;
 pub mod config;
 pub mod daemon;
+pub mod error;
 pub mod profiler;
 pub mod rules;
 pub mod system;

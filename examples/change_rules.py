@@ -13,8 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from fapolicy_analyzer import *
-from fapolicy_analyzer import RuleChangeset as Changeset
+from fapolicy_analyzer.rust import (
+    throw_exception,
+    MalformedMarkerError,
+    System,
+    RuleChangeset as Changeset
+)
 
 # config is loaded from $HOME/.config/fapolicy-analyzer/fapolicy-analyzer.toml
 
@@ -99,9 +103,7 @@ txt = """
 """
 try:
     xs1.parse(txt)
-except RuntimeError as e:
-    # todo;; we need those custom exceptions... without them we
-    #        are reduced to makeshift string based protocols
+except MalformedMarkerError as e:
     (line, msg, src) = str(e).split(":", 2)
     print(f"failed to deserialize: {msg}")
     print(f"\tline {line}: {src}")

@@ -8,6 +8,7 @@
 
 use pyo3::exceptions;
 use pyo3::prelude::*;
+use pyo3::{create_exception, PyObjectProtocol};
 
 use fapolicy_rules::db::Entry::*;
 use fapolicy_rules::db::{Entry, DB};
@@ -145,9 +146,10 @@ impl PyChangeset {
     pub fn parse(&mut self, text: &str) -> PyResult<()> {
         match self.rs.set(text.trim()) {
             Ok(_) => Ok(()),
-            Err(MalformedFileMarker(lnum, txt)) => Err(exceptions::PyRuntimeError::new_err(
-                format!("{}:malformed-file-marker:{}", lnum, txt),
-            )),
+            Err(MalformedFileMarker(lnum, txt)) => Err(MalformedMarkerError::new_err(format!(
+                "{}:malformed-file-marker:{}",
+                lnum, txt
+            ))),
             Err(ZeroRulesDefined) => Err(exceptions::PyRuntimeError::new_err(format!(
                 "{:?}",
                 ZeroRulesDefined
@@ -227,14 +229,27 @@ pub(crate) fn text_for_entry(e: &Entry) -> String {
     }
 }
 
-// #[pyfunction]
-// fn text_to_rule_db(txt: &str) -> PyResult<PyDict> {}
+create_exception!(rust, MalformedMarkerError, pyo3::exceptions::PyException);
 
-pub fn init_module(_py: Python, m: &PyModule) -> PyResult<()> {
+#[pyfunction]
+fn throw_exception(txt: &str) -> PyResult<()> {
+    Err(MalformedMarkerError::new_err(format!(
+        "malformed-file-marker:{}",
+        txt
+    )))
+}
+
+pub fn init_module(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyRule>()?;
     m.add_class::<PyRuleInfo>()?;
     m.add_class::<PyChangeset>()?;
     m.add_function(wrap_pyfunction!(rule_text_error_check, m)?)?;
+    m.add_function(wrap_pyfunction!(throw_exception, m)?)?;
+    m.add(
+        "MalformedMarkerError",
+        py.get_type::<MalformedMarkerError>(),
+    )?;
+
     Ok(())
 }
 
