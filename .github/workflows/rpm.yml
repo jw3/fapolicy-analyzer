@@ -55,6 +55,10 @@ jobs:
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
 
+      - name: Patch a file
+        run: |
+          echo '{"name": "bar"}' | tee fapolicy_analyzer/resources/build-info.json
+
       - name: Vendor
         run: |
           make -f .copr/Makefile vendor-app spec=fapolicy-analyzer.spec
