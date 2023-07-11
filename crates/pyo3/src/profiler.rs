@@ -13,7 +13,7 @@ use fapolicy_daemon::fapolicyd::wait_until_ready;
 use fapolicy_daemon::pipe;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
-use pyo3::{exceptions, PyResult, Python};
+use pyo3::{create_exception, exceptions, PyResult, Python};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
@@ -46,6 +46,8 @@ pub struct PyProfiler {
     callback_done: Option<PyObject>,
 }
 
+create_exception!(rust, ProfilerConfigError, pyo3::exceptions::PyException);
+
 #[pymethods]
 impl PyProfiler {
     #[new]
@@ -68,12 +70,12 @@ impl PyProfiler {
                 log::debug!("set_user: looking up username {uid_or_uname}");
                 Some(
                     read_users()
-                        .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))?
+                        .map_err(|e| ProfilerConfigError::new_err(format!("{:?}", e)))?
                         .iter()
                         .find(|x| x.name == uid_or_uname)
                         .map(|u| u.uid)
                         .ok_or_else(|| {
-                            PyRuntimeError::new_err(format!(
+                            ProfilerConfigError::new_err(format!(
                                 "unable to lookup uid by uname {}",
                                 uid_or_uname
                             ))
@@ -142,7 +144,7 @@ impl PyProfiler {
             // todo;; stable in 1.63
             // pwd.try_exists()?;
             if !pwd.exists() {
-                return Err(PyRuntimeError::new_err(format!(
+                return Err(ProfilerConfigError::new_err(format!(
                     "pwd does not exist {}",
                     pwd.display()
                 )));

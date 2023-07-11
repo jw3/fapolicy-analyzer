@@ -7,7 +7,7 @@
  */
 
 use pyo3::prelude::*;
-use pyo3::{exceptions, PyResult};
+use pyo3::{create_exception, exceptions, PyResult};
 use similar::{ChangeTag, TextDiff};
 
 use fapolicy_analyzer::events;
@@ -47,6 +47,11 @@ impl From<PySystem> for State {
     }
 }
 
+create_exception!(rust, ConfigLoadError, pyo3::exceptions::PyException);
+create_exception!(rust, AppStateLoadError, pyo3::exceptions::PyException);
+create_exception!(rust, EventParseError, pyo3::exceptions::PyException);
+create_exception!(rust, DeploymentError, pyo3::exceptions::PyException);
+
 #[pymethods]
 impl PySystem {
     /// Create a new uninitialized System
@@ -55,11 +60,11 @@ impl PySystem {
     #[new]
     fn new(py: Python) -> PyResult<PySystem> {
         py.allow_threads(|| {
-            let conf = cfg::All::load()
-                .map_err(|e| exceptions::PyRuntimeError::new_err(format!("{:?}", e)))?;
+            let conf =
+                cfg::All::load().map_err(|e| ConfigLoadError::new_err(format!("{:?}", e)))?;
             match State::load(&conf) {
                 Ok(state) => Ok(state.into()),
-                Err(e) => Err(exceptions::PyRuntimeError::new_err(format!("{:?}", e))),
+                Err(e) => Err(AppStateLoadError::new_err(format!("{:?}", e))),
             }
         })
     }
@@ -114,14 +119,13 @@ impl PySystem {
     /// Update the host system with this state of this System and signal fapolicyd to reload trust
     pub fn deploy(&self) -> PyResult<()> {
         log::debug!("deploy");
-        daemon::deploy(self).map_err(|e| exceptions::PyRuntimeError::new_err(format!("{:?}", e)))
+        daemon::deploy(self).map_err(|e| DeploymentError::new_err(format!("{:?}", e)))
     }
 
     /// Update the host system with this state of this System
     pub fn deploy_only(&self) -> PyResult<()> {
         log::debug!("deploy_only");
-        deploy_app_state(&self.rs)
-            .map_err(|e| exceptions::PyRuntimeError::new_err(format!("{:?}", e)))
+        deploy_app_state(&self.rs).map_err(|e| DeploymentError::new_err(format!("{:?}", e)))
     }
 
     /// Check the host system state against the state of this System
@@ -146,7 +150,7 @@ impl PySystem {
     fn load_debuglog(&self, log: &str) -> PyResult<PyEventLog> {
         log::debug!("load_debuglog");
         let xs = events::read::from_debug(log)
-            .map_err(|e| exceptions::PyRuntimeError::new_err(format!("{:?}", e)))?;
+            .map_err(|e| EventParseError::new_err(format!("{:?}", e)))?;
         Ok(PyEventLog::new(EventDB::from(xs), self.rs.trust_db.clone()))
     }
 
@@ -154,7 +158,7 @@ impl PySystem {
     fn load_syslog(&self) -> PyResult<PyEventLog> {
         log::debug!("load_syslog");
         let xs = events::read::from_syslog(&self.rs.config.system.syslog_file_path)
-            .map_err(|e| exceptions::PyRuntimeError::new_err(format!("{:?}", e)))?;
+            .map_err(|e| EventParseError::new_err(format!("{:?}", e)))?;
         Ok(PyEventLog::new(EventDB::from(xs), self.rs.trust_db.clone()))
     }
 
@@ -162,7 +166,7 @@ impl PySystem {
     fn load_auditlog(&self) -> PyResult<PyEventLog> {
         log::debug!("load_auditlog");
         let xs = events::read::from_auditlog()
-            .map_err(|e| exceptions::PyRuntimeError::new_err(format!("{:?}", e)))?;
+            .map_err(|e| EventParseError::new_err(format!("{:?}", e)))?;
         Ok(PyEventLog::new(EventDB::from(xs), self.rs.trust_db.clone()))
     }
 
@@ -248,11 +252,10 @@ fn rules_difference(lhs: &PySystem, rhs: &PySystem) -> String {
 #[pyfunction]
 fn checked_system(py: Python) -> PyResult<PySystem> {
     py.allow_threads(|| {
-        let conf = cfg::All::load()
-            .map_err(|e| exceptions::PyRuntimeError::new_err(format!("{:?}", e)))?;
+        let conf = cfg::All::load().map_err(|e| ConfigLoadError::new_err(format!("{:?}", e)))?;
         match State::load_checked(&conf) {
             Ok(state) => Ok(state.into()),
-            Err(e) => Err(exceptions::PyRuntimeError::new_err(format!("{:?}", e))),
+            Err(e) => Err(AppStateLoadError::new_err(format!("{:?}", e))),
         }
     })
 }

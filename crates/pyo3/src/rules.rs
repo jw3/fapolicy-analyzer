@@ -128,6 +128,10 @@ impl From<PyChangeset> for Changeset {
     }
 }
 
+create_exception!(rust, MalformedMarkerError, pyo3::exceptions::PyException);
+create_exception!(rust, NoRulesDefinedError, pyo3::exceptions::PyException);
+create_exception!(rust, RuleParsingError, pyo3::exceptions::PyException);
+
 #[pymethods]
 impl PyChangeset {
     #[new]
@@ -150,11 +154,11 @@ impl PyChangeset {
                 "{}:malformed-file-marker:{}",
                 lnum, txt
             ))),
-            Err(ZeroRulesDefined) => Err(exceptions::PyRuntimeError::new_err(format!(
+            Err(ZeroRulesDefined) => Err(NoRulesDefinedError::new_err(format!(
                 "{:?}",
                 ZeroRulesDefined
             ))),
-            Err(e) => Err(exceptions::PyRuntimeError::new_err(format!("{:?}", e))),
+            Err(e) => Err(RuleParsingError::new_err(format!("{:?}", e))),
         }
     }
 
@@ -228,8 +232,6 @@ pub(crate) fn text_for_entry(e: &Entry) -> String {
         e @ Comment(_) => e.to_string(),
     }
 }
-
-create_exception!(rust, MalformedMarkerError, pyo3::exceptions::PyException);
 
 #[pyfunction]
 fn throw_exception(txt: &str) -> PyResult<()> {
