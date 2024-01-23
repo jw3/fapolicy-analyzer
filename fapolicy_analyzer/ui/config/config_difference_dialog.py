@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import gi
 
-from fapolicy_analyzer import System, config_difference
+from fapolicy_analyzer.rust import System, config_difference
 from fapolicy_analyzer.ui.ui_widget import UIBuilderWidget
 from fapolicy_analyzer.ui.searchable_list import SearchableList
 

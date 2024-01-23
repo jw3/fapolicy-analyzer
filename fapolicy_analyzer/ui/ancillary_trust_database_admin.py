@@ -21,7 +21,7 @@ from typing import Sequence
 import gi
 
 import fapolicy_analyzer.ui.strings as strings
-from fapolicy_analyzer import Trust
+from fapolicy_analyzer.rust import Trust
 from fapolicy_analyzer.ui.actions import (
     NotificationType,
     add_notification,

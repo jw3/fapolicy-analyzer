@@ -18,7 +18,7 @@ from rx import of
 from rx.core.pipe import pipe
 from rx.operators import catch, map
 
-from fapolicy_analyzer import config_file_path
+from fapolicy_analyzer.rust import config_file_path
 from fapolicy_analyzer.redux import (
     Action,
     ReduxFeatureModule,

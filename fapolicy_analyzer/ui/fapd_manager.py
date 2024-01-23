@@ -21,7 +21,7 @@ import subprocess
 
 from datetime import datetime as DT
 from enum import Enum
-from fapolicy_analyzer import Handle
+from fapolicy_analyzer.rust import Handle
 from fapolicy_analyzer.ui.actions import NotificationType, add_notification
 from fapolicy_analyzer.ui.store import dispatch
 from fapolicy_analyzer.ui.strings import (

@@ -20,7 +20,7 @@ from typing import Optional, Sequence
 import gi
 from events import Events
 
-from fapolicy_analyzer import EventLog, Group, Trust, User
+from fapolicy_analyzer.rust import EventLog, Group, Trust, User
 from fapolicy_analyzer.ui.acl_list import ACLList
 from fapolicy_analyzer.ui.actions import (
     NotificationType,

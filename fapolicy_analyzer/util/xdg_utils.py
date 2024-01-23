@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-from fapolicy_analyzer import app_log_dir, app_data_dir, app_config_dir
+from fapolicy_analyzer.rust import app_log_dir, app_data_dir, app_config_dir
 
 
 def _app_dir_prefix(key):
@@ -35,9 +35,8 @@ def _app_dir_prefix(key):
             os.makedirs(app_tmp_dir, 0o700)
     except Exception as e:
         print(
-            "Warning: Directory creation of '{}' failed." "Using /tmp/".format(
-                app_tmp_dir
-            ),
+            "Warning: Directory creation of '{}' failed."
+            "Using /tmp/".format(app_tmp_dir),
             e,
         )
         app_tmp_dir = "/tmp/"

@@ -25,7 +25,7 @@ from rx import of
 from rx.core.pipe import pipe
 from rx.operators import catch, filter, map
 
-from fapolicy_analyzer import (
+from fapolicy_analyzer.rust import (
     System,
     Trust,
     check_ancillary_trust,

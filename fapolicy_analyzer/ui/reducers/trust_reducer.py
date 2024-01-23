@@ -15,7 +15,7 @@
 
 from typing import Any, NamedTuple, Optional, Sequence, Tuple, cast
 
-from fapolicy_analyzer import Trust
+from fapolicy_analyzer.rust import Trust
 from fapolicy_analyzer.redux import Action, Reducer, handle_actions
 from fapolicy_analyzer.ui.actions import (
     ANCILLARY_TRUST_LOAD_COMPLETE,

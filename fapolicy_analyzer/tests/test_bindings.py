@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from fapolicy_analyzer import config_file_path
+from fapolicy_analyzer.rust import config_file_path
 
 
 def test_config_file_path():

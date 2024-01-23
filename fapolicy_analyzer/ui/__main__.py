@@ -16,7 +16,7 @@
 import sys
 import logging
 
-from fapolicy_analyzer import init_native_logging
+from fapolicy_analyzer.rust import init_native_logging
 from fapolicy_analyzer.util.xdg_utils import (
     app_data_dir_prefix,
     app_state_dir_prefix,

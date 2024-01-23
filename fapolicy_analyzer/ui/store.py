@@ -18,7 +18,7 @@ import logging
 from rx.core.typing import Observable
 from rx.operators import map
 
-from fapolicy_analyzer import System
+from fapolicy_analyzer.rust import System
 from fapolicy_analyzer.redux import Action, create_store, select_feature
 from fapolicy_analyzer.ui.features import (
     APPLICATION_FEATURE,

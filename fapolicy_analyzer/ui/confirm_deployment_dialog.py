@@ -17,7 +17,7 @@ from locale import gettext as _
 from typing import Sequence, Tuple
 
 import gi
-from fapolicy_analyzer import System
+from fapolicy_analyzer.rust import System
 from fapolicy_analyzer.ui.rules.rules_difference_dialog import (
     RulesDifferenceDialog,
     filter_rule_diff,

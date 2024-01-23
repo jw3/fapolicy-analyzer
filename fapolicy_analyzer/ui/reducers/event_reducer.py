@@ -15,7 +15,7 @@
 
 from typing import Any, NamedTuple, Optional, Sequence, cast
 
-from fapolicy_analyzer import EventLog
+from fapolicy_analyzer.rust import EventLog
 from fapolicy_analyzer.ui.actions import ERROR_EVENTS, RECEIVED_EVENTS, REQUEST_EVENTS
 from fapolicy_analyzer.redux import Action, Reducer, handle_actions
 

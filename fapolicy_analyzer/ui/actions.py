@@ -17,7 +17,7 @@ from enum import Enum
 from itertools import count
 from typing import Any, Dict, Iterator, NamedTuple, Optional, Sequence
 
-from fapolicy_analyzer import Changeset, Event, Group, Rule, System, Trust, User
+from fapolicy_analyzer.rust import Changeset, Event, Group, Rule, System, Trust, User
 from fapolicy_analyzer.redux import Action, create_action
 from fapolicy_analyzer.ui.types import LogType
 

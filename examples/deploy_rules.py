@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from fapolicy_analyzer import *
-from fapolicy_analyzer import RuleChangeset as Changeset
+from fapolicy_analyzer.rust import RuleChangeset as Changeset
 
 # config is loaded from $HOME/.config/fapolicy-analyzer/fapolicy-analyzer.toml
 print("loading system")
@@ -52,8 +52,8 @@ print("diffing additional changes\n")
 s3 = s2.apply_rule_changes(xs)
 for ln in rules_difference(s2, s3).split("\n"):
     if ln.startswith("+"):
-        print('\033[92m', end='')
+        print("\033[92m", end="")
     elif ln.startswith("-"):
-        print('\033[91m', end='')
+        print("\033[91m", end="")
 
     print(f"{ln}  \033[0m")

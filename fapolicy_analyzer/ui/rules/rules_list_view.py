@@ -18,7 +18,7 @@ from typing import Any, Sequence, Tuple
 
 import gi
 
-from fapolicy_analyzer import Rule
+from fapolicy_analyzer.rust import Rule
 from fapolicy_analyzer.ui.configs import Colors, FontWeights
 from fapolicy_analyzer.ui.searchable_list import SearchableList
 from fapolicy_analyzer.ui.strings import RULE_LABEL, RULES_LABEL

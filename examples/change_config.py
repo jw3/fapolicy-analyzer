@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from fapolicy_analyzer import *
-from fapolicy_analyzer import ConfigChangeset as Changeset
+from fapolicy_analyzer.rust import ConfigChangeset as Changeset
 
 
 # a system represents the state of the host sytems

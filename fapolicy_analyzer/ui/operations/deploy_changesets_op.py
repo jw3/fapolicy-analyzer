@@ -19,7 +19,7 @@ from typing import Any, Optional, Sequence
 
 import gi
 
-from fapolicy_analyzer import System
+from fapolicy_analyzer.rust import System
 from fapolicy_analyzer.ui.actions import (
     NotificationType,
     add_notification,

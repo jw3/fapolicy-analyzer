@@ -17,7 +17,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Generic, TypeVar, List
 
 import fapolicy_analyzer
-from fapolicy_analyzer import System, ConfigInfo
+from fapolicy_analyzer.rust import System, ConfigInfo
 
 T = TypeVar("T", Dict[str, str], str)
 

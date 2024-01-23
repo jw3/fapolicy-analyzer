@@ -21,7 +21,7 @@ from rx import of
 from rx.core.pipe import pipe
 from rx.operators import catch, map
 
-from fapolicy_analyzer import Profiler, ExecHandle, ProcHandle
+from fapolicy_analyzer.rust import Profiler, ExecHandle, ProcHandle
 from fapolicy_analyzer.redux import (
     Action,
 )

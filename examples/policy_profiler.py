@@ -19,7 +19,7 @@ import sys
 import threading
 from functools import partial
 
-from fapolicy_analyzer import Profiler
+from fapolicy_analyzer.rust import Profiler
 
 
 def on_sigint(signum, frame, kill):
@@ -32,10 +32,14 @@ def main(*argv):
     parser.add_argument("target", nargs=argparse.REMAINDER)
 
     parser.add_argument("-r", "--rules", type=str, required=False, help="path to rules")
-    parser.add_argument("-d", "--dir", type=str, required=False, help="path to working dir")
+    parser.add_argument(
+        "-d", "--dir", type=str, required=False, help="path to working dir"
+    )
 
     user_opts = parser.add_mutually_exclusive_group(required=False)
-    user_opts.add_argument("-u", "--username", type=str, required=False, help="username")
+    user_opts.add_argument(
+        "-u", "--username", type=str, required=False, help="username"
+    )
     user_opts.add_argument("--uid", type=int, required=False, help="uid")
     parser.add_argument("-g", "--gid", type=int, required=False, help="gid")
 

@@ -15,7 +15,7 @@
 
 from typing import Any, NamedTuple, Optional, cast
 
-from fapolicy_analyzer import System
+from fapolicy_analyzer.rust import System
 from fapolicy_analyzer.redux import Action, Reducer, combine_reducers, handle_actions
 from fapolicy_analyzer.ui.actions import (
     ADD_CHANGESETS,
