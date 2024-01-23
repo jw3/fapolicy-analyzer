@@ -7,7 +7,7 @@
  */
 
 use pyo3::prelude::*;
-use pyo3::{create_exception, exceptions, PyResult};
+use pyo3::{create_exception, PyResult};
 use similar::{ChangeTag, TextDiff};
 
 use fapolicy_analyzer::events;
@@ -51,6 +51,7 @@ create_exception!(rust, ConfigLoadError, pyo3::exceptions::PyException);
 create_exception!(rust, AppStateLoadError, pyo3::exceptions::PyException);
 create_exception!(rust, EventParseError, pyo3::exceptions::PyException);
 create_exception!(rust, DeploymentError, pyo3::exceptions::PyException);
+create_exception!(rust, RuleIdentityError, pyo3::exceptions::PyException);
 
 #[pymethods]
 impl PySystem {
@@ -273,15 +274,21 @@ pub fn rule_identity(system: &PySystem) -> PyResult<String> {
             Comment(_) => acc,
             e => format!("{}\n{}\n", acc, crate::rules::text_for_entry(e)),
         });
-    sha256_digest(txt.as_bytes())
-        .map_err(|e| exceptions::PyRuntimeError::new_err(format!("{:?}", e)))
+    sha256_digest(txt.as_bytes()).map_err(|e| RuleIdentityError::new_err(format!("{:?}", e)))
 }
 
-pub fn init_module(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn init_module(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PySystem>()?;
     m.add_function(wrap_pyfunction!(config_difference, m)?)?;
     m.add_function(wrap_pyfunction!(rules_difference, m)?)?;
     m.add_function(wrap_pyfunction!(checked_system, m)?)?;
     m.add_function(wrap_pyfunction!(rule_identity, m)?)?;
+
+    m.add("ConfigLoadError", py.get_type::<ConfigLoadError>())?;
+    m.add("AppStateLoadError", py.get_type::<AppStateLoadError>())?;
+    m.add("EventParseError", py.get_type::<EventParseError>())?;
+    m.add("DeploymentError", py.get_type::<DeploymentError>())?;
+    m.add("RuleIdentityError", py.get_type::<RuleIdentityError>())?;
+
     Ok(())
 }
