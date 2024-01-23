@@ -6,6 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+use fapolicy_daemon::pipe;
 use pyo3::create_exception;
 use pyo3::prelude::*;
 
@@ -130,6 +131,7 @@ impl From<PyChangeset> for Changeset {
 create_exception!(rust, MalformedMarkerError, pyo3::exceptions::PyException);
 create_exception!(rust, NoRulesDefinedError, pyo3::exceptions::PyException);
 create_exception!(rust, RuleParsingError, pyo3::exceptions::PyException);
+create_exception!(rust, ReloadRulesError, pyo3::exceptions::PyException);
 
 #[pymethods]
 impl PyChangeset {
@@ -240,18 +242,27 @@ fn throw_exception(txt: &str) -> PyResult<()> {
     )))
 }
 
+/// send signal to fapolicyd FIFO pipe to reload rules
+#[pyfunction]
+fn signal_rule_reload() -> PyResult<()> {
+    pipe::reload_rules()
+        .map_err(|e| ReloadRulesError::new_err(format!("failed to signal rules reload: {:?}", e)))
+}
+
 pub fn init_module(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyRule>()?;
     m.add_class::<PyRuleInfo>()?;
     m.add_class::<PyChangeset>()?;
     m.add_function(wrap_pyfunction!(rule_text_error_check, m)?)?;
     m.add_function(wrap_pyfunction!(throw_exception, m)?)?;
+    m.add_function(wrap_pyfunction!(signal_rule_reload, m)?)?;
     m.add("NoRulesDefinedError", py.get_type::<NoRulesDefinedError>())?;
     m.add("RuleParsingError", py.get_type::<RuleParsingError>())?;
     m.add(
         "MalformedMarkerError",
         py.get_type::<MalformedMarkerError>(),
     )?;
+    m.add("ReloadRulesError", py.get_type::<ReloadRulesError>())?;
 
     Ok(())
 }
