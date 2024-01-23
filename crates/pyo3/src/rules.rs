@@ -6,9 +6,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use pyo3::exceptions;
+use pyo3::create_exception;
 use pyo3::prelude::*;
-use pyo3::{create_exception, PyObjectProtocol};
 
 use fapolicy_rules::db::Entry::*;
 use fapolicy_rules::db::{Entry, DB};
