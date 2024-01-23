@@ -10,13 +10,14 @@ use pyo3::create_exception;
 use std::collections::HashMap;
 
 use fapolicy_daemon::pipe;
+use pyo3::exceptions::PyException;
 use pyo3::prelude::*;
 
 use fapolicy_trust::ops::{get_path_action_map, Changeset};
 use fapolicy_trust::stat::{Actual, Status};
 use fapolicy_trust::Trust;
 
-create_exception!(rust, ReloadTrustError, pyo3::exceptions::PyException);
+create_exception!(rust, ReloadTrustError, PyException);
 
 /// Trust entry
 ///

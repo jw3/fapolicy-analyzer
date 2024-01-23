@@ -11,7 +11,7 @@ use fapolicy_analyzer::users::read_users;
 use fapolicy_app::sys::Error::WriteRulesFail;
 use fapolicy_daemon::fapolicyd::wait_until_ready;
 use fapolicy_daemon::pipe;
-use pyo3::exceptions::PyRuntimeError;
+use pyo3::exceptions::PyException;
 use pyo3::prelude::*;
 use pyo3::{create_exception, exceptions, PyResult, Python};
 use std::collections::HashMap;
@@ -26,6 +26,7 @@ use std::time::{Duration, SystemTime};
 use std::{io, thread};
 
 use crate::system::PySystem;
+use crate::trust::ReloadTrustError;
 use fapolicy_daemon::profiler::Profiler;
 use fapolicy_rules::read::load_rules_db;
 
@@ -46,7 +47,9 @@ pub struct PyProfiler {
     callback_done: Option<PyObject>,
 }
 
-create_exception!(rust, ProfilerConfigError, pyo3::exceptions::PyException);
+create_exception!(rust, ProfilerConfigError, PyException);
+create_exception!(rust, ProfilerIOError, PyException);
+create_exception!(rust, ProfilerExecError, PyException);
 
 #[pymethods]
 impl PyProfiler {
@@ -160,7 +163,7 @@ impl PyProfiler {
 
         // generate the daemon and target logs
         let (events_log, mut stdout_log, mut stderr_log) = create_log_files(self.log_dir.as_ref())
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))?;
+            .map_err(|e| ProfilerIOError::new_err(format!("Failed to write logs: {:?}", e)))?;
 
         // set the daemon stdout log, aka the events log
         if let Some((_, path)) = events_log.as_ref() {
@@ -428,7 +431,10 @@ impl Execd {
         match self.proc.as_mut().unwrap().try_wait() {
             Ok(Some(_)) => Ok(false),
             Ok(None) => Ok(true),
-            Err(e) => Err(PyRuntimeError::new_err(format!("{:?}", e))),
+            Err(e) => Err(ProfilerExecError::new_err(format!(
+                "Run check failed: {:?}",
+                e
+            ))),
         }
     }
 
@@ -438,7 +444,7 @@ impl Execd {
             .as_mut()
             .unwrap()
             .kill()
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+            .map_err(|e| ProfilerExecError::new_err(format!("Kill process failed: {:?}", e)))
     }
 
     /// Kill more
@@ -496,11 +502,15 @@ fn reload_profiler_rules(system: &PySystem) -> PyResult<()> {
         .map_err(|e| exceptions::PyRuntimeError::new_err(format!("Reload failed: {:?}", e)))
 }
 
-pub fn init_module(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn init_module(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyProfiler>()?;
     m.add_class::<ProcHandle>()?;
     m.add_class::<ExecHandle>()?;
     m.add_function(wrap_pyfunction!(reload_profiler_rules, m)?)?;
+
+    m.add("ProfilerConfigError", py.get_type::<ProfilerConfigError>())?;
+    m.add("ProfilerIOError", py.get_type::<ProfilerIOError>())?;
+    m.add("ProfilerExecError", py.get_type::<ProfilerExecError>())?;
 
     Ok(())
 }
