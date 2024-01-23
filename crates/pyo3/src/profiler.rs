@@ -26,7 +26,6 @@ use std::time::{Duration, SystemTime};
 use std::{io, thread};
 
 use crate::system::PySystem;
-use crate::trust::ReloadTrustError;
 use fapolicy_daemon::profiler::Profiler;
 use fapolicy_rules::read::load_rules_db;
 

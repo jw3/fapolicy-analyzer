@@ -13,9 +13,13 @@ use fapolicy_daemon::conf::{with_error_message, Line};
 use fapolicy_daemon::fapolicyd::Version;
 use fapolicy_daemon::svc::State::{Active, Inactive};
 use fapolicy_daemon::svc::{wait_for_service, Handle};
-use pyo3::exceptions;
-use pyo3::exceptions::PyRuntimeError;
+use pyo3::exceptions::PyException;
 use pyo3::prelude::*;
+use pyo3::{create_exception, exceptions};
+
+create_exception!(rust, DaemonError, PyException);
+create_exception!(rust, DaemonStartError, DaemonError);
+create_exception!(rust, DaemonStopError, DaemonError);
 
 #[pyclass(module = "svc", name = "Handle")]
 #[derive(Clone, Default)]
@@ -46,32 +50,32 @@ impl PyHandle {
     pub fn start(&self) -> PyResult<()> {
         self.rs
             .start()
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+            .map_err(|e| DaemonStartError::new_err(format!("{:?}", e)))
     }
 
     pub fn stop(&self) -> PyResult<()> {
         self.rs
             .stop()
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+            .map_err(|e| DaemonStopError::new_err(format!("{:?}", e)))
     }
 
     pub fn enable(&self) -> PyResult<()> {
         self.rs
             .enable()
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+            .map_err(|e| DaemonError::new_err(format!("{:?}", e)))
     }
 
     pub fn disable(&self) -> PyResult<()> {
         self.rs
             .disable()
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+            .map_err(|e| DaemonError::new_err(format!("{:?}", e)))
     }
 
     /// returns the unit status, throws if invalid unit
     pub fn is_active(&self) -> PyResult<bool> {
         self.rs
             .active()
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+            .map_err(|e| DaemonError::new_err(format!("{:?}", e)))
     }
 
     /// returns true if the unit is valid, false otherwise
@@ -82,13 +86,13 @@ impl PyHandle {
     #[pyo3(signature = (timeout = 15))]
     pub fn wait_until_active(&self, timeout: usize) -> PyResult<()> {
         wait_for_service(&self.rs, Active, timeout)
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+            .map_err(|e| DaemonError::new_err(format!("{:?}", e)))
     }
 
     #[pyo3(signature = (timeout = 15))]
     pub fn wait_until_inactive(&self, timeout: usize) -> PyResult<()> {
         wait_for_service(&self.rs, Inactive, timeout)
-            .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+            .map_err(|e| DaemonError::new_err(format!("{:?}", e)))
     }
 }
 
@@ -135,7 +139,7 @@ fn rollback_fapolicyd(to: PySystem) -> PyResult<()> {
 fn is_fapolicyd_active() -> PyResult<bool> {
     Handle::default()
         .active()
-        .map_err(|e| PyRuntimeError::new_err(format!("{:?}", e)))
+        .map_err(|e| DaemonError::new_err(format!("{:?}", e)))
 }
 
 pub(crate) fn conf_to_text(db: &conf::DB) -> String {
@@ -238,7 +242,7 @@ fn conf_text_error_check(txt: &str) -> Option<String> {
     }
 }
 
-pub fn init_module(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn init_module(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyHandle>()?;
     m.add_class::<PyChangeset>()?;
     m.add_class::<PyConfigInfo>()?;
@@ -248,6 +252,10 @@ pub fn init_module(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(rollback_fapolicyd, m)?)?;
     m.add_function(wrap_pyfunction!(is_fapolicyd_active, m)?)?;
     m.add_function(wrap_pyfunction!(conf_text_error_check, m)?)?;
+    m.add("DaemonError", py.get_type::<DaemonError>())?;
+    m.add("DaemonStartError", py.get_type::<DaemonStartError>())?;
+    m.add("DaemonStopError", py.get_type::<DaemonStopError>())?;
+
     Ok(())
 }
 
