@@ -246,6 +246,8 @@ pub fn init_module(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyChangeset>()?;
     m.add_function(wrap_pyfunction!(rule_text_error_check, m)?)?;
     m.add_function(wrap_pyfunction!(throw_exception, m)?)?;
+    m.add("NoRulesDefinedError", py.get_type::<NoRulesDefinedError>())?;
+    m.add("RuleParsingError", py.get_type::<RuleParsingError>())?;
     m.add(
         "MalformedMarkerError",
         py.get_type::<MalformedMarkerError>(),
